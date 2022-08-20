@@ -6,15 +6,15 @@ import "@chainlink/contracts/src/v0.8/KeeperCompatible.sol";
 import "hardhat/console.sol";
 
 error Raffle__NotEnoughETHEntered();
-error Raffer__TransactionFailed();
-error Raffer__NotOpen();
-error Raffer__UpkeepNotNeeded(
+error Raffle__TransactionFailed();
+error Raffle__NotOpen();
+error Raffle__UpkeepNotNeeded(
   uint256 currentBalance,
   uint256 numPlayer,
   uint256 raffleState
 );
 
-abstract contract Raffer is VRFConsumerBaseV2, KeeperCompatibleInterface {
+contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
   enum RaffleState {
     OPEN,
     CALCULATING
@@ -94,16 +94,16 @@ abstract contract Raffer is VRFConsumerBaseV2, KeeperCompatibleInterface {
     s_lastTimeStamp = block.timestamp;
     (bool success, ) = recentWinner.call{value: address(this).balance}("");
     if (!success) {
-      revert Raffer__TransactionFailed();
+      revert Raffle__TransactionFailed();
     }
     if (s_raffleState != RaffleState.OPEN) {
-      revert Raffer__NotOpen();
+      revert Raffle__NotOpen();
     }
     emit WinnerPicked(recentWinner);
   }
 
-  function checkUpkeep(bytes calldata checkData)
-    external
+  function checkUpkeep(bytes memory checkData)
+    public
     override
     returns (bool isUpkeepNeeded, bytes memory)
   {
@@ -123,7 +123,7 @@ abstract contract Raffer is VRFConsumerBaseV2, KeeperCompatibleInterface {
   function performUpkeep(bytes calldata) external override {
     (bool upCheckUpkeep, ) = this.checkUpkeep("");
     if (!upCheckUpkeep) {
-      revert Raffer__UpkeepNotNeeded(
+      revert Raffle__UpkeepNotNeeded(
         address(this).balance,
         s_players.length,
         uint256(s_raffleState)
