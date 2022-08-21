@@ -13,6 +13,7 @@ const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 const COINMARTKETCAP_API_KEY = process.env.COINMARTKETCAP_API_KEY
 const PRIVATE_KEY = process.env.PRIVATE_KEY || ""
 const config: HardhatUserConfig = {
+  solidity: "0.8.7",
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
@@ -28,7 +29,16 @@ const config: HardhatUserConfig = {
       accounts: [PRIVATE_KEY],
     },
   },
-  solidity: "0.8.7",
+  etherscan: {
+    apiKey: ETHERSCAN_API_KEY,
+  },
+  gasReporter: {
+    enabled: false,
+    currency: "USD",
+    outputFile: "gas-reporter-report.txt",
+    // coinmarketcap: COINMARTKETCAP_API_KEY,
+    token: "ETH",
+  },
   namedAccounts: {
     deployer: {
       default: 0,
@@ -36,6 +46,9 @@ const config: HardhatUserConfig = {
     player: {
       default: 1,
     },
+  },
+  mocha: {
+    timeout: 500000, // 500 seconds
   },
 }
 export default config

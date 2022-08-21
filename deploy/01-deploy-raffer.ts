@@ -1,3 +1,4 @@
+import { VRFCoordinatorV2Mock } from "./../typechain-types/@chainlink/contracts/src/v0.8/mocks/VRFCoordinatorV2Mock"
 import { developmentChains, networkConfig } from "./../helper-hardhat-config"
 import { HardhatRuntimeEnvironment } from "hardhat/types"
 import { ethers, network } from "hardhat"
@@ -12,11 +13,9 @@ export default async function deployRaffer({
   const { deploy, log } = deployments
   const { deployer } = await getNamedAccounts()
   const chainId: number = network.config.chainId!
-  let subcriptionId, vrfCoordinatorAddress
+  let subcriptionId, vrfCoordinatorAddress, vrfCoordinatorV2Mock
   if (developmentChains.includes(network.name)) {
-    const vrfCoordinatorV2Mock = await ethers.getContract(
-      "VRFCoordinatorV2Mock"
-    )
+    vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
     vrfCoordinatorAddress = await vrfCoordinatorV2Mock.address
     const transactionRespone = await vrfCoordinatorV2Mock.createSubscription()
     const transactionReceipt = await transactionRespone.wait(1)
@@ -50,6 +49,10 @@ export default async function deployRaffer({
     // @ts-ignore
     waitConfirmations: network.config.blockConfirmations,
   })
+  if (developmentChains.includes(network.name)) {
+    await vrfCoordinatorV2Mock?.addConsumer(subcriptionId, raffle.address)
+  }
+
   log("--------------------------------------")
   log(`Raffle deployed at ${raffle.address}`)
   log("--------------------------------------")
