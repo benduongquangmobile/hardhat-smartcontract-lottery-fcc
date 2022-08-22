@@ -3,3 +3,4 @@ artifacts
 cache
 .vscode
 typechain-types
+deployments/rinkeby/.chainId

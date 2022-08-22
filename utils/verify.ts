@@ -6,7 +6,7 @@ export async function verify(contractAddress: string, args: any[]) {
   try {
     await run("verify:verify", {
       address: contractAddress,
-      args: args,
+      constructorArguments: args,
     })
   } catch (error: any) {
     if (error.message.includes("verify:verify")) {

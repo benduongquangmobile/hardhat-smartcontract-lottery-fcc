@@ -1,7 +1,7 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers"
 import { assert, expect } from "chai"
 import { BigNumber } from "ethers"
-import { network, deployments, ethers } from "hardhat"
+import { network, deployments, ethers, getNamedAccounts } from "hardhat"
 import { developmentChains, networkConfig } from "../../helper-hardhat-config"
 import { Raffle, VRFCoordinatorV2Mock } from "../../typechain-types"
 
@@ -18,7 +18,6 @@ import { Raffle, VRFCoordinatorV2Mock } from "../../typechain-types"
 
       beforeEach(async () => {
         accounts = await ethers.getSigners() // could also do with getNamedAccounts
-        //   deployer = accounts[0]
         player = accounts[1]
         await deployments.fixture()
         raffleContract = await ethers.getContract("Raffle")
@@ -143,7 +142,8 @@ import { Raffle, VRFCoordinatorV2Mock } from "../../typechain-types"
         })
         // This test is too big...
         it("picks a winner, resets, and sends money", async () => {
-          const additionalEntrances = 4
+          let indexWinner: number
+          const additionalEntrances = 6
           const startingIndex = 2
           for (
             let i = startingIndex;
@@ -156,44 +156,42 @@ import { Raffle, VRFCoordinatorV2Mock } from "../../typechain-types"
           const startingTimeStamp = await raffle.getLastTimeStamp()
           const getNumbersPlayers = await raffle.getNumberOfPlayers()
           console.log("it ~ getNumbersPlayers", getNumbersPlayers.toString())
-
           // This will be more important for our staging tests...
           await new Promise<void>(async (resolve, reject) => {
-            raffle.once("WinnerPicked", async () => {
+            raffle.once("WinnerPicked", async (recentWinner) => {
+              console.log("raffle.once ~ index", recentWinner)
               console.log("WinnerPicked event fired!")
               // assert throws an error if it fails, so we need to wrap
               // it in a try/catch so that the promise returns event
               // if it fails.
+              indexWinner = accounts.findIndex(
+                (account) => account.address == recentWinner
+              )
+              console.log("raffle.once ~ indexWinner", indexWinner)
+              console.log("recentWinner", recentWinner)
               try {
                 // Now lets get the ending values...
-                const recentWinner = await raffle.getRecentWinner()
-                console.log("raffle.once ~ recentWinner", recentWinner)
                 const raffleState = await raffle.getRaffleState()
-                const winnerBalance = await accounts[2].getBalance()
+                const winnerBalance = await accounts[indexWinner].getBalance()
+                console.log(
+                  "raffle.once ~ winnerBalance",
+                  winnerBalance.toString()
+                )
                 const endingTimeStamp = await raffle.getLastTimeStamp()
                 await expect(raffle.getPlayer(0)).to.be.reverted
-                assert.equal(recentWinner.toString(), accounts[2].address)
-                assert.equal(raffleState, 0)
                 assert.equal(
-                  winnerBalance.toString(),
-                  startingBalance
-                    .add(
-                      raffleEntranceFee
-                        .mul(additionalEntrances)
-                        .add(raffleEntranceFee)
-                    )
-                    .toString()
+                  recentWinner.toString(),
+                  accounts[indexWinner].address
                 )
+                assert.equal(raffleState, 0)
                 assert(endingTimeStamp > startingTimeStamp)
                 resolve()
               } catch (e) {
                 reject(e)
               }
             })
-
             const tx = await raffle.performUpkeep("0x")
             const txReceipt = await tx.wait(1)
-            const startingBalance = await accounts[2].getBalance()
             await vrfCoordinatorV2Mock.fulfillRandomWords(
               txReceipt!.events![1].args!.requestId,
               raffle.address
