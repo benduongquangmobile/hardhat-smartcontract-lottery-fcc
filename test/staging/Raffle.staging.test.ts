@@ -33,7 +33,6 @@ developmentChains.includes(network.name)
                 const raffleState = await raffle.getRaffleState()
                 const winnerEndingBalance = await accounts[0].getBalance()
                 const endingTimeStamp = await raffle.getLastTimeStamp()
-
                 await expect(raffle.getPlayer(0)).to.be.reverted
                 assert.equal(recentWinner.toString(), accounts[0].address)
                 assert.equal(raffleState, 0)
@@ -52,9 +51,9 @@ developmentChains.includes(network.name)
             console.log("Entering Raffle...")
             const tx = await raffle.enterRaffle({ value: raffleEntranceFee })
             await tx.wait(1)
-            await raffle.performUpkeep("0x0")
             console.log("Ok, time to wait...")
             const winnerStartingBalance = await accounts[0].getBalance()
+
             // and this code WONT complete until our listener has finished listening!
           })
         })
