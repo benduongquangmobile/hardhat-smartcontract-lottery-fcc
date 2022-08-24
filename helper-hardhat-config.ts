@@ -24,13 +24,13 @@ export const networkConfig: networkConfigInfo = {
     entranceFe: ethers.utils.parseEther("0.01"),
     gasLane:
       "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc",
-    subscriptionId: "0",
-    callbackGasLimit: (5e6).toString(), //500.000,
+    subscriptionId: "18742",
+    callbackGasLimit: "500000", //500.000,
     interval: "30",
   },
   31337: {
     name: "hardhat",
-    callbackGasLimit: (5e6).toString(), //500.000,
+    callbackGasLimit: "500000", //500.000,
     entranceFe: ethers.utils.parseEther("0.01"),
     gasLane:
       "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc",

@@ -26,7 +26,9 @@ export default async function deployRaffer({
     )
   } else {
     vrfCoordinatorAddress = networkConfig[chainId].vrfCoordinatorV2
+    console.log("vrfCoordinatorAddress", vrfCoordinatorAddress)
     subcriptionId = networkConfig[chainId].subscriptionId
+    console.log("subcriptionId", subcriptionId)
   }
 
   const entranceFee = networkConfig[chainId].entranceFe

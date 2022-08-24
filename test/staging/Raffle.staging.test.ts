@@ -13,8 +13,8 @@ developmentChains.includes(network.name)
         deployer = (await getNamedAccounts()).deployer
         raffle = await ethers.getContract("Raffle", deployer)
         raffleEntranceFee = await raffle.getEntranceFee()
+        raffle.connect(deployer)
       })
-
       describe("fulfillRandomWords", function () {
         it("works with live Chainlink Keepers and Chainlink VRF, we get a random winner", async function () {
           // enter the raffle
@@ -53,7 +53,6 @@ developmentChains.includes(network.name)
             await tx.wait(1)
             console.log("Ok, time to wait...")
             const winnerStartingBalance = await accounts[0].getBalance()
-
             // and this code WONT complete until our listener has finished listening!
           })
         })

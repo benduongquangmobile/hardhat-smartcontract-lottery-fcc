@@ -92,6 +92,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
     s_raffleState = RaffleState.OPEN;
     s_players = new address payable[](0);
     s_lastTimeStamp = block.timestamp;
+    console.log("s_lastTimeStamp", s_lastTimeStamp);
     (bool success, ) = recentWinner.call{value: address(this).balance}("");
     if (!success) {
       revert Raffle__TransactionFailed();
@@ -104,17 +105,18 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
 
   function checkUpkeep(
     bytes memory /*checkData*/
-  ) public view override returns (bool isUpkeepNeeded, bytes memory) {
+  ) public view override returns (bool upkeepNeeded, bytes memory) {
     bool isOpen = s_raffleState == RaffleState.OPEN;
     bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_internval);
     bool hasPlayers = (s_players.length > 0);
     bool hasBalance = address(this).balance > 0;
-    isUpkeepNeeded = isOpen && timePassed && hasPlayers && hasBalance;
-    return (isUpkeepNeeded, "0x0");
+    upkeepNeeded = isOpen && timePassed && hasPlayers && hasBalance;
+    return (upkeepNeeded, "0x0");
   }
 
   function performUpkeep(bytes calldata) external override {
     (bool upCheckUpkeep, ) = checkUpkeep("");
+    console.log("performUpkeep ~ upCheckUpkeep", upCheckUpkeep);
     if (!upCheckUpkeep) {
       revert Raffle__UpkeepNotNeeded(
         address(this).balance,

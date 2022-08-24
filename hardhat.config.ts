@@ -10,7 +10,7 @@ import "@typechain/hardhat"
 
 const RINKEBY_PROVIDER_URL = process.env.RPC_URL
 const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
-const COINMARTKETCAP_API_KEY = process.env.COINMARTKETCAP_API_KEY
+// const COINMARTKETCAP_API_KEY = process.env.COINMARTKETCAP_API_KEY
 const PRIVATE_KEY = process.env.PRIVATE_KEY || ""
 const SUBCRIPTION_ID = process.env.SUBCRIPTION_ID || ""
 const config: HardhatUserConfig = {
@@ -28,7 +28,6 @@ const config: HardhatUserConfig = {
       blockConfirmations: 6,
       url: RINKEBY_PROVIDER_URL,
       accounts: [PRIVATE_KEY],
-      subcriptionId: SUBCRIPTION_ID,
     },
   },
   etherscan: {
@@ -50,7 +49,11 @@ const config: HardhatUserConfig = {
     },
   },
   mocha: {
-    timeout: 500000, // 500 seconds
+    timeout: 50000000, // 5 hours
+  },
+  contractSizer: {
+    runOnCompile: false,
+    only: ["Raffle"],
   },
 }
 export default config
