@@ -1,8 +1,8 @@
+import { assert, expect } from "chai"
 import { BigNumber } from "ethers"
+import { ethers, getNamedAccounts, network } from "hardhat"
+import { developmentChains } from "../../helper-hardhat-config"
 import { Raffle } from "./../../typechain-types/contracts/Raffle"
-const { assert, expect } = require("chai")
-const { getNamedAccounts, deployments, ethers, network } = require("hardhat")
-const { developmentChains } = require("../../helper-hardhat-config")
 
 developmentChains.includes(network.name)
   ? describe.skip
@@ -30,6 +30,7 @@ developmentChains.includes(network.name)
               try {
                 // add our asserts here
                 const recentWinner = await raffle.getRecentWinner()
+                console.log("raffle.once ~ recentWinner", recentWinner)
                 const raffleState = await raffle.getRaffleState()
                 const winnerEndingBalance = await accounts[0].getBalance()
                 const endingTimeStamp = await raffle.getLastTimeStamp()

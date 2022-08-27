@@ -5,12 +5,11 @@ export interface networkConfigItem {
   name?: string
   subscriptionId?: string
   gasLane?: string
-  keepersUpdateInterval?: string
   raffleEntranceFee?: string
   callbackGasLimit?: string
   vrfCoordinatorV2?: string
   entranceFe?: BigNumber
-  interval?: string
+  keepersUpdateInterval?: string
 }
 
 export interface networkConfigInfo {
@@ -20,21 +19,21 @@ export interface networkConfigInfo {
 export const networkConfig: networkConfigInfo = {
   4: {
     name: "rinkeby",
-    vrfCoordinatorV2: "0x6168499c0cFfCaCD319c818142124B7A15E857ab",
+    vrfCoordinatorV2: "0x6168499c0cFfCaCD319c818142124B7A15E857ab", //VRF Coordinator //https://docs.chain.link/docs/vrf/v2/supported-networks/
     entranceFe: ethers.utils.parseEther("0.01"),
     gasLane:
-      "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc",
-    subscriptionId: "18742",
+      "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc", //30 gwei Key Hash //https://docs.chain.link/docs/vrf/v2/supported-networks/
+    subscriptionId: "20251",
     callbackGasLimit: "500000", //500.000,
-    interval: "30",
+    keepersUpdateInterval: "50",
   },
   31337: {
     name: "hardhat",
     callbackGasLimit: "500000", //500.000,
     entranceFe: ethers.utils.parseEther("0.01"),
     gasLane:
-      "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc",
-    interval: "30",
+      "0xd89b2bf150e3b9e13446986e571fb9cab24b13cea0a43ea20a6049a85cc807cc", //30 gwei Key Hash //https://docs.chain.link/docs/vrf/v2/supported-networks/
+    keepersUpdateInterval: "50",
   },
 }
 

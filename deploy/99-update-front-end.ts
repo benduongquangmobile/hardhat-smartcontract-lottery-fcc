@@ -24,7 +24,6 @@ async function updateContractAddress() {
       fs.readFileSync(FRONT_END_PATH_FILE, "utf8")
     ) as any
     const chainId = network.config.chainId?.toString() as string
-
     if (chainId! in currentAddress) {
       if (!currentAddress[chainId].includes(raffle.address)) {
         currentAddress[chainId].push(raffle.address)
@@ -41,7 +40,6 @@ async function updateContractAddress() {
 async function uppdateAbi() {
   try {
     const raffle = await ethers.getContract("Raffle")
-
     fs.writeFileSync(
       FRONT_END_ABI_PATH_FILE,
       raffle.interface.format(ethers.utils.FormatTypes.json) as any

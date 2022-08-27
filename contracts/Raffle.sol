@@ -7,7 +7,7 @@ import "hardhat/console.sol";
 
 error Raffle__NotEnoughETHEntered();
 error Raffle__TransactionFailed();
-error Raffle__NotOpen();
+error Raffle__RaffleNotOpen();
 error Raffle__UpkeepNotNeeded(
   uint256 currentBalance,
   uint256 numPlayer,
@@ -44,7 +44,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
     bytes32 gasLane,
     uint64 subscriptionId,
     uint32 callbackGasLimit,
-    uint256 interval
+    uint256 keepersUpdateInterval
   ) VRFConsumerBaseV2(vtfCoordinatorV2) {
     i_entranceFee = entranceFee;
     i_vrfCoordinator = VRFCoordinatorV2Interface(vtfCoordinatorV2);
@@ -52,7 +52,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
     i_subscriptionId = subscriptionId;
     i_callbackGasLimit = callbackGasLimit;
     s_raffleState = RaffleState.OPEN;
-    i_internval = interval;
+    i_internval = keepersUpdateInterval;
   }
 
   function enterRaffle() public payable {
@@ -61,7 +61,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
       revert Raffle__NotEnoughETHEntered();
     }
     if (s_raffleState != RaffleState.OPEN) {
-      revert Raffle__NotOpen();
+      revert Raffle__RaffleNotOpen();
     }
     s_players.push(payable(msg.sender));
     emit RaffleEnter(msg.sender);
@@ -92,20 +92,19 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
     s_raffleState = RaffleState.OPEN;
     s_players = new address payable[](0);
     s_lastTimeStamp = block.timestamp;
-    console.log("s_lastTimeStamp", s_lastTimeStamp);
     (bool success, ) = recentWinner.call{value: address(this).balance}("");
     if (!success) {
       revert Raffle__TransactionFailed();
     }
     if (s_raffleState != RaffleState.OPEN) {
-      revert Raffle__NotOpen();
+      revert Raffle__RaffleNotOpen();
     }
     emit WinnerPicked(recentWinner);
   }
 
   function checkUpkeep(
     bytes memory /*checkData*/
-  ) public view override returns (bool upkeepNeeded, bytes memory) {
+  ) external view override returns (bool upkeepNeeded, bytes memory) {
     bool isOpen = s_raffleState == RaffleState.OPEN;
     bool timePassed = ((block.timestamp - s_lastTimeStamp) > i_internval);
     bool hasPlayers = (s_players.length > 0);
@@ -115,8 +114,7 @@ contract Raffle is VRFConsumerBaseV2, KeeperCompatibleInterface {
   }
 
   function performUpkeep(bytes calldata) external override {
-    (bool upCheckUpkeep, ) = checkUpkeep("");
-    console.log("performUpkeep ~ upCheckUpkeep", upCheckUpkeep);
+    (bool upCheckUpkeep, ) = this.checkUpkeep("");
     if (!upCheckUpkeep) {
       revert Raffle__UpkeepNotNeeded(
         address(this).balance,

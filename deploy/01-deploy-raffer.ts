@@ -13,13 +13,15 @@ export default async function deployRaffer({
   const { deploy, log } = deployments
   const { deployer } = await getNamedAccounts()
   const chainId: number = network.config.chainId!
-  let subcriptionId, vrfCoordinatorAddress, vrfCoordinatorV2Mock
+  let subcriptionId,
+    vrfCoordinatorAddress,
+    vrfCoordinatorV2Mock: VRFCoordinatorV2Mock
   if (developmentChains.includes(network.name)) {
     vrfCoordinatorV2Mock = await ethers.getContract("VRFCoordinatorV2Mock")
     vrfCoordinatorAddress = await vrfCoordinatorV2Mock.address
     const transactionRespone = await vrfCoordinatorV2Mock.createSubscription()
     const transactionReceipt = await transactionRespone.wait(1)
-    subcriptionId = transactionReceipt.events[0].args.subId
+    subcriptionId = transactionReceipt!.events![0].args!.subId
     await vrfCoordinatorV2Mock.fundSubscription(
       subcriptionId,
       VRF_SUB_FUND_AMMOUNT
@@ -34,7 +36,7 @@ export default async function deployRaffer({
   const entranceFee = networkConfig[chainId].entranceFe
   const gasLane = networkConfig[chainId].gasLane
   const callbackGasLimit = networkConfig[chainId].callbackGasLimit
-  const interval = networkConfig[chainId].interval
+  const keepersUpdateInterval = networkConfig[chainId].keepersUpdateInterval
 
   const args = [
     vrfCoordinatorAddress,
@@ -42,7 +44,7 @@ export default async function deployRaffer({
     gasLane,
     subcriptionId,
     callbackGasLimit,
-    interval,
+    keepersUpdateInterval,
   ]
   const raffle = await deploy("Raffle", {
     from: deployer,
@@ -52,6 +54,7 @@ export default async function deployRaffer({
     waitConfirmations: network.config.blockConfirmations,
   })
   if (developmentChains.includes(network.name)) {
+    // @ts-ignore
     await vrfCoordinatorV2Mock?.addConsumer(subcriptionId, raffle.address)
   }
 

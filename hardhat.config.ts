@@ -14,13 +14,15 @@ const ETHERSCAN_API_KEY = process.env.ETHERSCAN_API_KEY
 const PRIVATE_KEY = process.env.PRIVATE_KEY || ""
 const SUBCRIPTION_ID = process.env.SUBCRIPTION_ID || ""
 const config: HardhatUserConfig = {
-  solidity: "0.8.7",
+  solidity: "0.8.9",
   defaultNetwork: "hardhat",
   networks: {
     hardhat: {
       chainId: 31337,
       // @ts-ignore
       blockConfirmations: 1,
+      saveDeployments: true,
+      allowUnlimitedContractSize: true,
     },
     rinkeby: {
       chainId: 4,
@@ -28,6 +30,15 @@ const config: HardhatUserConfig = {
       blockConfirmations: 6,
       url: RINKEBY_PROVIDER_URL,
       accounts: [PRIVATE_KEY],
+    },
+    localhost: {
+      chainId: 31337,
+      // @ts-ignore
+      blockConfirmations: 1,
+      gas: 21000000,
+      gasPrice: 8000000000,
+      saveDeployments: true,
+      allowUnlimitedContractSize: true,
     },
   },
   etherscan: {
@@ -49,7 +60,7 @@ const config: HardhatUserConfig = {
     },
   },
   mocha: {
-    timeout: 50000000, // 5 hours
+    timeout: 2000000, // 2 minutes
   },
   contractSizer: {
     runOnCompile: false,
