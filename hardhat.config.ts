@@ -60,7 +60,7 @@ const config: HardhatUserConfig = {
     },
   },
   mocha: {
-    timeout: 2000000, // 2 minutes
+    timeout: 5000000, // 5 minutes
   },
   contractSizer: {
     runOnCompile: false,
